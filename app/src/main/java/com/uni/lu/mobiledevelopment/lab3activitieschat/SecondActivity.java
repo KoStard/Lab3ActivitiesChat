@@ -1,22 +1,32 @@
 package com.uni.lu.mobiledevelopment.lab3activitieschat;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class SecondActivity extends AppCompatActivity {
+import java.util.List;
+
+public class SecondActivity extends MessagesHistoryKeepingActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-        // Get the message from the intent
+        // Print savedInstanceState
+        System.out.println("savedInstanceState: " + savedInstanceState);
+        if (savedInstanceState != null) {
+            messages = (List<Message>) savedInstanceState.getSerializable("messages");
+            for (Message message : messages) {
+                addMessage(message.getSender(), message.getMessage());
+            }
+        }
         String message = getIntent().getStringExtra("message");
-        addMessage("Sender", message);
+        if (message != null) {
+            addMessage("Sender", message);
+            saveMessage("Sender", message);
+            getIntent().removeExtra("message");
+        }
     }
 
     public void replyMessage(View view) {
@@ -28,13 +38,5 @@ public class SecondActivity extends AppCompatActivity {
         intent.putExtra("reply", reply);
         setResult(RESULT_OK, intent);
         finish();
-    }
-
-    private void addMessage(String sender, String message) {
-        LinearLayout messagesContainer = findViewById(R.id.messagesContainer);
-        // Use TextView to display the message
-        TextView messageView = new TextView(this);
-        messageView.setText(sender + ": " + message);
-        messagesContainer.addView(messageView);
     }
 }
